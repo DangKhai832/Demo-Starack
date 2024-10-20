@@ -55,3 +55,10 @@ button[pButton]:disabled {
 .forgot-password {
   margin-top: 1rem;
 }
+input.ng-invalid {
+  border-color: red; /* Bôi đỏ khi không hợp lệ */
+}
+
+.error-message {
+  margin-top: 5px; /* Khoảng cách giữa thông báo lỗi và trường nhập liệu */
+}

@@ -1,1 +1,238 @@
-<p>user-management works!</p>
+<div class="user-management-content">
+  <div class="header-content">
+    <h3>List of Users</h3>
+    <div class="button-group">
+      <button class="filter-button"><img src="assets/images/iconFilter.svg" style="padding-right : 5px" alt="">Filters</button>
+      <button class="add-member-button" (click)="showSidebar()">
+        <img src="assets/images/iconPlus.svg" style="padding-right: 5px" alt="">Add New Member
+      </button>
+    </div>
+  </div>
+
+  <div class="search-form" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative;">
+    <img src="assets/images/iconSearchWhite.svg" class="search-icon"/>
+    <input type="text" placeholder="Search by full name" (keydown.enter)="loadUsers(0)" class="search-input" [(ngModel)]="searchKeyword"/>
+    <button class="btn-search add-member-button" (click)="loadUsers(0)">Search</button>
+  </div>
+
+  <p-table [value]="users" [lazy]="true" (onLazyLoad)="loadUsers(0)" [loading]="loading">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="font-weight: bold;">No</th>
+        <th style="font-weight: bold;">User ID</th>
+        <th style="font-weight: bold;">Full Name</th>
+        <th style="font-weight: bold;">Email</th>
+        <th style="font-weight: bold;">Role</th>
+        <th style="text-align: center;font-weight: bold;">Join Date</th>
+        <th style="text-align: center;font-weight: bold;">Status</th>
+        <th style="text-align: center;font-weight: bold;">Action</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-user let-i="rowIndex">
+      <tr>
+        <td>{{i + 1}}</td>
+        <td>
+          {{ shortenId(user.id) }}
+          <img src="assets/images/iconCopy.svg" alt="Copy ID" style="cursor: pointer;" (click)="copyId(user.id)" />
+        </td>
+        <td>{{user.fullName}}</td>
+        <td>{{user.email}}</td>
+        <td>
+          <p-chip *ngIf="user.role === 'Super admin'" label="Super admin" [style]="{'background-color': 'rgba(98, 34, 171, 0.2)', 'color': 'rgba(98, 34, 171, 1)', 'font-weight' : 'bold'}"></p-chip>
+          <p-chip *ngIf="user.role === 'Trainer'" label="Trainer" [style]="{'background-color': 'rgba(10, 83, 168, 0.2)', 'color': 'rgba(10, 83, 168, 1)', 'font-weight' : 'bold'}"></p-chip>
+          <p-chip *ngIf="user.role === 'Member'" label="Member" [style]="{'background-color': 'rgba(56, 66, 80, 0.08)', 'color': 'rgba(56, 66, 80, 1)', 'font-weight' : 'bold'}"></p-chip>
+        </td>
+        <td>{{user.createAt | date:'d MMMM y \'at\' h:mm a'}}</td>
+        <td>
+          <p-chip *ngIf="user.status === 'ACTIVATED'" label="ACTIVATED" [style]="{'background-color': 'rgba(21, 183, 158, 0.12)', 'color': 'rgba(16, 117, 105, 1)', 'font-weight' : 'bold'}"></p-chip>
+          <p-chip *ngIf="user.status === 'WAITING'" label="WAITING" [style]="{'background-color': 'rgba(247, 144, 9, 0.12)', 'color': 'rgba(181, 71, 8, 1)', 'font-weight' : 'bold'}"></p-chip>
+        </td>
+        <td>
+          <button style="border: none;margin-right : 5px" class="btn btn-outline-primary btn-sm" (click)="viewUser(user)">
+            <img src="assets/images/iconView.svg" alt="View"/>
+          </button>
+          <button style="border: none; margin-right: 5px" class="btn btn-outline-primary btn-sm" (click)="showSidebar(true, user)">
+            <img src="assets/images/iconEdit.svg" alt="Edit"/>
+          </button>
+          <button style="border: none;" class="btn btn-outline-primary btn-sm" (click)="deleteUser(user.id)">
+            <img src="assets/images/iconDelete.svg" alt="Delete"/>
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-paginator [rows]="10" [totalRecords]="totalItems" (onPageChange)="loadUsers($event)" [rowsPerPageOptions]="[5, 10, 20, 50]"></p-paginator>
+</div>
+
+<p-sidebar [(visible)]="sidebarVisible" position="right" [style]="{'width': '40%'}">
+  <div style="margin-left: 20px; display: flex; flex-direction: column; height: 100%;">
+    <div style="flex-grow: 1;">
+      <h3 class="mb-4">{{ isEditing ? 'Edit User' : 'Add New Member' }}</h3>
+      <div *ngIf="isEditing" class="form-group row mb-3">
+        <label class="col-sm-3 col-form-label">User ID</label>
+        <div class="col-sm-9">
+          <input pInputText [(ngModel)]="newMember.id" disabled class="form-control" />
+        </div>
+      </div>
+      <div class="form-group row mb-3">
+        <label class="col-sm-3 col-form-label">Email</label>
+        <div class="col-sm-9">
+          <input pInputText [(ngModel)]="newMember.email" class="form-control" />
+        </div>
+      </div>
+      <div class="form-group row mb-3">
+        <label class="col-sm-3 col-form-label">Full Name</label>
+        <div class="col-sm-9">
+          <input pInputText [(ngModel)]="newMember.fullName" class="form-control" />
+        </div>
+      </div>
+      <div *ngIf="!isEditing" class="form-group row mb-3">
+        <label class="col-sm-3 col-form-label">Password</label>
+        <div class="col-sm-9">
+          <input pInputText type="password" [(ngModel)]="newMember.password" class="form-control" />
+        </div>
+      </div>
+      <div *ngIf="!isEditing" class="form-group row mb-3">
+        <label class="col-sm-3 col-form-label">Confirm Password</label>
+        <div class="col-sm-9">
+          <input pInputText type="password" [(ngModel)]="newMember.confirmPassword" class="form-control" />
+        </div>
+      </div>
+      <div class="form-group row mb-3">
+        <label class="col-sm-3 col-form-label">Role</label>
+        <div class="col-sm-9">
+          <p-dropdown [(ngModel)]="newMember.role"
+                      [options]="[ {label: 'Super admin', value: 'Super admin'}, {label: 'Trainer', value: 'Trainer'}, {label: 'Member', value: 'Member'} ]"
+                      [showClear]="true" [style]="{'width' : '100%'}" placeholder="Select a Role"></p-dropdown>
+        </div>
+      </div>
+      <div class="form-group row mb-3">
+        <label class="col-sm-3 col-form-label">Status</label>
+        <div class="col-sm-9">
+          <p-dropdown [(ngModel)]="newMember.status"
+                      [options]="[{label: 'ACTIVATED', value: 'ACTIVATED'}, {label: 'WAITING', value: 'WAITING'}]"
+                      [showClear]="true" [style]="{'width' : '100%'}" placeholder="Select a Status"
+                      (onChange)="updateStatus($event.value)"></p-dropdown>
+        </div>
+      </div>
+    </div>
+    <div class="button-group d-flex justify-content-end mb-3">
+      <p-button *ngIf="!isEditing" label="Save" icon="pi pi-check" (click)="addMember()" styleClass="p-button-success mr-2"></p-button>
+      <p-button *ngIf="isEditing" label="Save" icon="pi pi-check" (click)="updateUser()" styleClass="p-button-success mr-2"></p-button>
+      <p-button label="Cancel" icon="pi pi-times" (click)="sidebarVisible = false" styleClass="p-button-danger"></p-button>
+    </div>
+  </div>
+</p-sidebar>
+<p-sidebar [(visible)]="viewSidebarVisible" position="right" [style]="{'width': '40%'}">
+  <p-tabView>
+    <p-tabPanel header="Overview">
+      <div style="margin-left: 20px; display: flex; flex-direction: column; height: 100%;">
+        <div style="flex-grow: 1;" *ngIf="selectedUser">
+          <h3 class="mb-4">{{ selectedUser.fullName || 'User Details' }}</h3>
+          <div class="form-group row mb-3">
+            <label class="col-sm-3 col-form-label">User ID</label>
+            <div class="col-sm-9">
+              <input type="text" [(ngModel)]="selectedUser.id" disabled class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row mb-3">
+            <label class="col-sm-3 col-form-label">Email</label>
+            <div class="col-sm-9">
+              <input type="text" [(ngModel)]="selectedUser.email" disabled class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row mb-3">
+            <label class="col-sm-3 col-form-label">Full Name</label>
+            <div class="col-sm-9">
+              <input type="text" [(ngModel)]="selectedUser.fullName" disabled class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row mb-3">
+            <label class="col-sm-3 col-form-label">Role</label>
+            <div class="col-sm-9">
+              <p-dropdown [(ngModel)]="selectedUser.role"
+                          [options]="[{ label: 'Super admin', value: 'Super admin' }, { label: 'Trainer', value: 'Trainer' }, { label: 'Member', value: 'Member' }]"
+                          [showClear]="true" [style]="{'width' : '100%'}" placeholder="Select a Role" [disabled]="true"></p-dropdown>
+            </div>
+          </div>
+          <div class="form-group row mb-3">
+            <label class="col-sm-3 col-form-label">Status</label>
+            <div class="col-sm-9">
+              <p-dropdown [(ngModel)]="selectedUser.status"
+                          [options]="[{ label: 'ACTIVATED', value: 'ACTIVATED' }, { label: 'WAITING', value: 'WAITING' }]"
+                          [showClear]="true" [style]="{'width' : '100%'}" placeholder="Select a Status"
+                          [disabled]="true"></p-dropdown>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="Logs">
+      <div style="margin-left: 20px; display: flex; flex-direction: column; height: 100%;">
+        <div style="flex-grow: 1;">
+          <div class="form-group row mb-3">
+            <label class="col-sm-3 col-form-label">Create At</label>
+            <div class="col-sm-9">
+              <input type="text" disabled class="form-control"
+                     [value]="trackLogData.length > 0 ? (trackLogData[0]?.createAt | date:'d MMMM y \'at\' h:mm a') : 'N/A'" />
+            </div>
+          </div>
+          <div class="form-group row mb-3">
+            <label class="col-sm-3 col-form-label">Updated At</label>
+            <div class="col-sm-9">
+              <input type="text" disabled class="form-control"
+                     [value]="trackLogData.length > 0 ? (trackLogData[trackLogData.length - 1]?.updatedAt | date:'d MMMM y \'at\' h:mm a') : 'N/A'" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Bảng hiển thị logs -->
+        <table class="table">
+          <thead>
+          <tr>
+            <th style="width: 30%">TIMER</th>
+            <th style="width: 70%">ACTION</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let log of trackLogData">
+            <td style="display: flex"><img src="assets/images/avatarDefault.svg" alt="">{{ log?.updatedAt | date:'d MMMM y \'at\' h:mm a' }}</td>
+            <td *ngIf="log.createAt">
+              Create user successfully
+            </td>
+            <td *ngIf="!log.createAt">
+              {{ log.fieldName }} is changed from <b>{{ log.oldValue }}</b> to <b>{{ log.newValue }}</b>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </p-tabPanel>
+
+
+  </p-tabView>
+</p-sidebar>
+
+
+<<div class="modal" tabindex="-1" role="dialog" *ngIf="showConfirmDialog" [ngClass]="{'show': showConfirmDialog}">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Delete</h5>
+        <button type="button" class="close" (click)="closeConfirmDialog()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Bạn có chắc chắn muốn xóa người dùng này?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeConfirmDialog()">Hủy</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete(userId)">Xóa</button>
+      </div>
+    </div>
+  </div>
+</div>
+

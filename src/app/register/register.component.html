@@ -1,1 +1,46 @@
-<p>register works!</p>
+<div class="register-page">
+    <div class="back-button" (click)="navigateToLogin()">
+      <img src="assets/images/iconBack.svg"  alt="Quay lại" />
+      <span class="back-text">Back</span>
+    </div>
+  <div class="register-container">
+    <div class="header">
+      <h1>Register</h1>
+      <p>Already have an account? <a href="/login">Log in</a></p>
+    </div>
+    <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)" novalidate>
+      <!-- Trường Nhập Tên -->
+      <div class="form-group">
+        <p-floatLabel>
+          <input id="name" type="text" style="width : 100%;border-radius: 7px;" pInputText [(ngModel)]="user.name" name="name" required />
+          <label for="name">Name</label>
+        </p-floatLabel>
+      </div>
+
+      <!-- Trường Nhập Email -->
+      <div class="form-group">
+        <p-floatLabel>
+          <input id="email" type="email" style="width : 100%;border-radius: 7px;" pInputText [(ngModel)]="user.email" name="email" required />
+          <label for="email">Email</label>
+        </p-floatLabel>
+      </div>
+
+      <!-- Trường Nhập Mật khẩu -->
+      <div class="form-group">
+        <p-floatLabel>
+          <input id="password" type="password" style="width : 100%;border-radius: 7px;" pInputText [(ngModel)]="user.password" name="password" required />
+          <label for="password">Password</label>
+        </p-floatLabel>
+      </div>
+
+      <!-- Điều khoản và điều kiện -->
+      <div class="terms-container">
+        <input type="checkbox" id="terms" [(ngModel)]="user.acceptedTerms" name="acceptedTerms" required />
+        <label for="terms">I have read the <a href="#">Terms and Conditions</a></label>
+      </div>
+
+      <!-- Nút Đăng ký -->
+      <button pButton label="Register" class="bg-primary" style="border-radius : 10px" type="submit" [disabled]="!registerForm.valid || !user.acceptedTerms"></button>
+    </form>
+  </div>
+</div>

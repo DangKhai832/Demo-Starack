@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent {
   user = {
-    username: '',
+    email: '',
     password: ''
   };
 
@@ -20,10 +20,17 @@ export class LoginComponent {
 
   onSubmit(loginForm: any) {
     if (loginForm.valid) {
-      this.authService.login(this.user).subscribe(
+      const data = {
+        email: this.user.email,
+        password: this.user.password,
+      };
+      this.authService.login(data).subscribe(
         response => {
+          // Lưu token vào session storage
+          debugger
+          this.authService.setToken(response.token);
           this.toastr.success("Login successful!", 'Successful!');
-          // Điều hướng đến trang khác nếu cần
+          this.router.navigate(['/manage/overview']);
         },
         error => {
           this.toastr.error(error.error, 'Error!');
@@ -31,6 +38,7 @@ export class LoginComponent {
       );
     }
   }
+
 
   navigateToRegister() {
     this.router.navigate(['/register']);

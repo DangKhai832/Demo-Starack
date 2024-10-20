@@ -1,30 +1,34 @@
 <div class="manage-container">
   <!-- Sidebar -->
+
   <div class="sidebar">
+    <img src="assets/images/logoVer.svg" style="height: 42px;margin-bottom : 20px" alt="">
     <ul>
       <li>
-        <a [routerLink]="['/manage/posts']" routerLinkActive="active">
-          <img src="assets/images/quanlybaiviet.svg" alt=""> Quản lý bài viết
+        <a [routerLink]="['/manage/overview']" (click)="getContent('Overview')" routerLinkActive="active">
+          <img src="assets/images/iconOverview.svg" alt=""> Overview
         </a>
       </li>
       <li>
-        <a [routerLink]="['/manage/room-list']" routerLinkActive="active">
-          <img src="assets/images/quanliphongchothue.svg" alt=""> Quản lý phòng cho thuê
-        </a>
-      </li>
-      <li>
-        <a [routerLink]="['/manage/manageAppointments']" routerLinkActive="active">
-          <img src="assets/images/quanlylichhen.svg" alt=""> Quản lý lịch hẹn
+        <a [routerLink]="['/manage/user-management']" (click)="getContent('User Management')" routerLinkActive="active">
+          <img src="assets/images/iconUserManagement.svg" alt=""> User Management
         </a>
       </li>
     </ul>
   </div>
   <div class="content">
-    <div *ngIf="isUserManagementPage()">
-      <app-user-management></app-user-management>
+    <div class="button-top">
+      <img src="assets/images/iconSearch.svg" alt="">
+      <img src="assets/images/iconUser.svg" alt="">
     </div>
-    <div *ngIf="isOverviewPage()">
-      <app-overview></app-overview>
+    <h3 style="margin : 10px 60px 30px 60px">{{content}}</h3>
+    <div style="margin : 0 60px 0 60px" class="main-content">
+      <div class="get-content" *ngIf="isUserManagementPage()">
+        <app-user-management></app-user-management>
+      </div>
+      <div class="get-content" *ngIf="isOverviewPage()">
+        <app-overview></app-overview>
+      </div>
     </div>
   </div>
 </div>
