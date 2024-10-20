@@ -1,0 +1,37 @@
+<div class="login-page">
+  <div class="back-button" (click)="navigateToRegister()">
+    <img src="assets/images/iconBack.svg" alt="Quay lại" />
+    <span class="back-text">Back</span>
+  </div>
+  <div class="login-container">
+    <div class="header">
+      <h1>Login</h1>
+      <p>Don't have an account? <a (click)="navigateToRegister()">Register</a></p>
+    </div>
+    <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)" novalidate>
+      <!-- Trường Nhập Tên Người Dùng -->
+      <div class="form-group">
+        <p-floatLabel>
+          <input id="username" type="text" style="width: 100%; border-radius: 7px;" pInputText [(ngModel)]="user.username" name="username" required />
+          <label for="username">Username</label>
+        </p-floatLabel>
+      </div>
+
+      <!-- Trường Nhập Mật Khẩu -->
+      <div class="form-group">
+        <p-floatLabel>
+          <input id="password" type="password" style="width: 100%; border-radius: 7px;" pInputText [(ngModel)]="user.password" name="password" required />
+          <label for="password">Password</label>
+        </p-floatLabel>
+      </div>
+
+      <!-- Nút Đăng Nhập -->
+      <button pButton label="Login" class="bg-primary" style="border-radius: 10px" type="submit" [disabled]="!loginForm.valid"></button>
+
+      <!-- Liên kết Quên Mật Khẩu -->
+      <p class="forgot-password">
+        <a (click)="navigateToRegister()">Forgot password?</a>
+      </p>
+    </form>
+  </div>
+</div>

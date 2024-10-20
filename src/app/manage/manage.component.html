@@ -1,0 +1,30 @@
+<div class="manage-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <ul>
+      <li>
+        <a [routerLink]="['/manage/posts']" routerLinkActive="active">
+          <img src="assets/images/quanlybaiviet.svg" alt=""> Quản lý bài viết
+        </a>
+      </li>
+      <li>
+        <a [routerLink]="['/manage/room-list']" routerLinkActive="active">
+          <img src="assets/images/quanliphongchothue.svg" alt=""> Quản lý phòng cho thuê
+        </a>
+      </li>
+      <li>
+        <a [routerLink]="['/manage/manageAppointments']" routerLinkActive="active">
+          <img src="assets/images/quanlylichhen.svg" alt=""> Quản lý lịch hẹn
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="content">
+    <div *ngIf="isUserManagementPage()">
+      <app-user-management></app-user-management>
+    </div>
+    <div *ngIf="isOverviewPage()">
+      <app-overview></app-overview>
+    </div>
+  </div>
+</div>
